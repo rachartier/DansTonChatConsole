@@ -39,7 +39,7 @@ int GetWordPosition(t_chunk chunk, const char *word) {
     for(int i = 0; i < chunk.size; ++i) {
         if(chunk.memory[i] == word[0]) {
             int j;
-            for(j = 0; j < (int)(int)strlen(word); ++j) {            
+            for(j = 0; j < (int)strlen(word); ++j) {            
                if(chunk.memory[j + i] != word[j]) {
                     word_found = false;
                     i += j;
@@ -68,7 +68,7 @@ int GetLastQuoteId(t_chunk chunk) {
             digits[j++] = chunk.memory[i];        
         }
     }
-    return (int)atoi(digits);
+    return atoi(digits);
 }
 
 void EreaseHtmlInQuote(char *arr, int quote_lenght) {
@@ -104,19 +104,19 @@ void EreaseHtmlInQuote(char *arr, int quote_lenght) {
     pch = strtok(arr, delimiter);
 
     while(pch != NULL) {
-        for(int i = 0; i < n_keywords; ++i)
+        for(int i = 0; i < n_keywords; ++i) {
             if(strcmp(pch, keyword[i]) == 0) {
                 success = false;
                 if(i == 1)
                     new_line = true;
             }
-        
-            for(int i = n_keywords; i < n_punctutations + n_keywords; ++i) {
-                if(strcmp(pch, keyword[i]) == 0) {
-                    success = false;
-                    strcat(tmp_arr, punctuation_translated[i - n_keywords]);
-                } 
-            }
+        }
+        for(int i = n_keywords; i < n_punctutations + n_keywords; ++i) {
+            if(strcmp(pch, keyword[i]) == 0) {
+                success = false;
+                strcat(tmp_arr, punctuation_translated[i - n_keywords]);
+            } 
+        }
         if(success) {
             if(new_line) {
                 strcat(tmp_arr, "\n");
@@ -217,7 +217,7 @@ int main(int argc, char *argv[]) {
     t_chunk    chunk;
 
     chunk.memory = malloc(1);
-    chunk.size = 0u;
+    chunk.size = 0;
 
     curl_global_init(CURL_GLOBAL_ALL);
 
