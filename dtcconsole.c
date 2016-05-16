@@ -40,7 +40,7 @@ int GetWordPosition(t_chunk chunk, const char *word) {
         if(chunk.memory[i] == word[0]) {
             int j;
             for(j = 0; j < (int)strlen(word); ++j) {            
-               if(chunk.memory[j + i] != word[j]) {
+                if(chunk.memory[j + i] != word[j]) {
                     word_found = false;
                     i += j;
                     break;                  
@@ -75,7 +75,7 @@ void EreaseHtmlInQuote(char *arr, int quote_lenght) {
 
     static const int   n_keywords = 3;
     static const int   n_punctutations = 3;
-   
+
     static char *delimiter = {"<>#&;"};
 
     static const char *keyword[] = {
@@ -98,7 +98,7 @@ void EreaseHtmlInQuote(char *arr, int quote_lenght) {
 
     char *pch = NULL;
     char *tmp_arr = malloc(quote_lenght + 1);
-    
+
     memset(tmp_arr, 0, quote_lenght);
 
     pch = strtok(arr, delimiter);
@@ -122,20 +122,20 @@ void EreaseHtmlInQuote(char *arr, int quote_lenght) {
                 strcat(tmp_arr, "\n");
                 new_line = false;
             }            
-            
+
             strcat(tmp_arr, pch);            
         }
         else
             success = true;
-       
+
         pch = strtok(NULL, delimiter);
     }   
- 
+
     strcat(tmp_arr, "\n\n\0");
 
     memset(arr, 0, quote_lenght);
     for(int i = 0; tmp_arr[i] != '\0'; ++i) arr[i] = tmp_arr[i];
-    
+
     free(tmp_arr);
 }
 
@@ -152,7 +152,7 @@ void PrintQuote(char *arr, int quote_id) {
 void ShowQuote(int quote_id) {
     CURL        *curl_handle = NULL;
     CURLcode     res;
-    
+
     t_chunk     chunk;
 
     char        url[128] = "http://danstonchat.com/";
@@ -162,7 +162,7 @@ void ShowQuote(int quote_id) {
     chunk.size = 0;
 
     sprintf(quote_id_text, "%d", quote_id);
-    
+
     strcat(url, quote_id_text); 
     strcat(url, ".html");
 
@@ -176,7 +176,7 @@ void ShowQuote(int quote_id) {
 
     if(res == CURLE_OK) { 
         char    *quote_text = NULL;
- 
+
         int  size_word = (int)strlen("class=\"decoration\">");        
         int  quote_lenght;
 
@@ -185,14 +185,14 @@ void ShowQuote(int quote_id) {
 
         quote_lenght = quote_end_index - quote_begin_index;
         quote_text = malloc(quote_lenght * sizeof(char));
-        
+
         for(int i = 0; i < quote_lenght; ++i) {
             quote_text[i] = chunk.memory[quote_begin_index + i]; 
         }        
-        
+
         ParseQuote(quote_text, quote_lenght);
         PrintQuote(quote_text, quote_id);
-     
+
         curl_easy_cleanup(curl_handle);
         free(quote_text);
         free(chunk.memory); 
@@ -210,7 +210,7 @@ int GetNumberThirdArgument(int argc, char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
-        
+
     CURL        *curl_handle = NULL;
     CURLcode    res;
 
@@ -222,7 +222,7 @@ int main(int argc, char *argv[]) {
     curl_global_init(CURL_GLOBAL_ALL);
 
     curl_handle = curl_easy_init();
-    
+
 
     if(curl_handle) {
         srand(time(NULL));
@@ -237,30 +237,34 @@ int main(int argc, char *argv[]) {
         }
         else {
             int last_id_quote = GetLastQuoteId(chunk);
+            if(argc > 1) {
+                if(strcmp(argv[1], "-r") == 0
+                        || strcmp(argv[1], "-random") == 0) {
+                    int rand_id_quote = rand() % (last_id_quote + 1);
 
-            if(strcmp(argv[1], "-r") == 0
-            || strcmp(argv[1], "-random") == 0) {
-                int rand_id_quote = rand() % (last_id_quote + 1);
-                
-                for(int i = 0; i < GetNumberThirdArgument(argc, argv); ++i) {
-                    rand_id_quote = rand() % (last_id_quote + 1);        
-                    ShowQuote(rand_id_quote);
-                }                  
+                    for(int i = 0; i < GetNumberThirdArgument(argc, argv); ++i) {
+                        rand_id_quote = rand() % (last_id_quote + 1);        
+                        ShowQuote(rand_id_quote);
+                    }                  
 
-            }
-            else if(strcmp(argv[1], "-l") == 0
-            ||      strcmp(argv[1], "-last") == 0) {
-                for(int i = 0; i < GetNumberThirdArgument(argc, argv); ++i)
-                    ShowQuote(last_id_quote - i);
-            }
-            else if(strcmp(argv[1], "-q") == 0
-            ||      strcmp(argv[1], "-quote") == 0) {
-                int quote_id = GetNumberThirdArgument(argc, argv);
+                }
+                else if(strcmp(argv[1], "-l") == 0
+                ||      strcmp(argv[1], "-last") == 0) {
+                    for(int i = 0; i < GetNumberThirdArgument(argc, argv); ++i)
+                        ShowQuote(last_id_quote - i);
+                }
+                else if(strcmp(argv[1], "-q") == 0
+                ||      strcmp(argv[1], "-quote") == 0) {
+                    int quote_id = GetNumberThirdArgument(argc, argv);
 
-                if(quote_id > 0 && quote_id <= last_id_quote) {
-                    ShowQuote(quote_id);        
-                } else {
-                    fprintf(stderr, "La quote n'existe pas.\n");        
+                    if(quote_id > 0 && quote_id <= last_id_quote) {
+                        ShowQuote(quote_id);        
+                    } else {
+                        fprintf(stderr, "La quote n'existe pas.\n");        
+                    }
+                }
+                else {
+                    fprintf(stderr,"Commande inconnue.\n");    
                 }
             }
             else
