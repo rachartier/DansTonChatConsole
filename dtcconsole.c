@@ -199,11 +199,12 @@ void ShowQuote(int quote_id) {
 
         curl_easy_cleanup(curl_handle);
         free(quote_text);
-        free(chunk.memory); 
     }
     else {
         fprintf(stderr, "Impossible de se connecter");
     }
+
+    free(chunk.memory); 
 }
 
 int GetNumberThirdArgument(int argc, char *argv[]) {
@@ -276,10 +277,10 @@ int main(int argc, char *argv[]) {
         }
 
         curl_easy_cleanup(curl_handle);
-        free(chunk.memory);
-
         curl_global_cleanup();
     } 
+
+    free(chunk.memory);
 
     return EXIT_SUCCESS;        
 }
