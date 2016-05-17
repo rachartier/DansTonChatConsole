@@ -1,5 +1,5 @@
 # DansTonChatConsole
-Permet de lire les quotes du célèbre site "danstonchat.com" dans votre terminal.
+Permet de lire les quotes du célèbre site "danstonchat.com" dans le terminal.
 
 Compilation:
 ------------
