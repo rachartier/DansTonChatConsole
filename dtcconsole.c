@@ -15,8 +15,8 @@ struct s_chunk {
 typedef struct s_chunk t_chunk;
 
 int WriteInMemory(void *contents, size_t size, size_t nmemb, void *userp) {
-    int      realsize = size * nmemb;
-    t_chunk    *chunk = (t_chunk *)userp;
+    int         realsize = size * nmemb;
+    t_chunk     *chunk = (t_chunk *)userp;
 
     chunk->memory = realloc(chunk->memory, chunk->size + realsize + 1);
 
@@ -114,6 +114,11 @@ void EreaseHtmlInQuote(char *arr, int quote_lenght) {
         for(int i = n_keywords; i < n_punctutations + n_keywords; ++i) {
             if(strcmp(pch, keyword[i]) == 0) {
                 success = false;
+
+                if(new_line) {
+                    strcat(tmp_arr, "\n");
+                    new_line = false;
+                }            
                 strcat(tmp_arr, punctuation_translated[i - n_keywords]);
             } 
         }
@@ -122,7 +127,6 @@ void EreaseHtmlInQuote(char *arr, int quote_lenght) {
                 strcat(tmp_arr, "\n");
                 new_line = false;
             }            
-
             strcat(tmp_arr, pch);            
         }
         else
@@ -249,12 +253,12 @@ int main(int argc, char *argv[]) {
 
                 }
                 else if(strcmp(argv[1], "-l") == 0
-                ||      strcmp(argv[1], "-last") == 0) {
+                        ||      strcmp(argv[1], "-last") == 0) {
                     for(int i = 0; i < GetNumberThirdArgument(argc, argv); ++i)
                         ShowQuote(last_id_quote - i);
                 }
                 else if(strcmp(argv[1], "-q") == 0
-                ||      strcmp(argv[1], "-quote") == 0) {
+                        ||      strcmp(argv[1], "-quote") == 0) {
                     int quote_id = GetNumberThirdArgument(argc, argv);
 
                     if(quote_id > 0 && quote_id <= last_id_quote) {
