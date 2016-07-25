@@ -14,6 +14,6 @@ Commandes:
 
 Il n'est pas obligatoire d'entrer un nombre.
 
-    ./dtconsole -random (-r)[N]: permet de lire aléatoirement N quote(s)
-    ./dtconsole -last (-l)[N]: permet de lire les N dernières quotes.
-    ./dtconsole -quote (-q)[ID]: permet de lire la quote demandé.
+    ./dtconsole --random (-r)[N]: permet de lire aléatoirement N quote(s)
+    ./dtconsole --last (-l)[N]: permet de lire les N dernières quotes.
+    ./dtconsole --quote (-q)[ID]: permet de lire la quote demandé.
