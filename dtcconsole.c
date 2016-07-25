@@ -4,6 +4,8 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include <time.h>
+#include <unistd.h>
+#include <getopt.h>
 
 #include <curl/curl.h>
 
@@ -78,7 +80,7 @@ int GetLastQuoteId(void) {
 
     char        digits[16] = {'\0'};
 
-    chunk.memory = malloc(1);
+    chunk.memory = NULL;
     chunk.size = 0;
    
     curl_handle = curl_easy_init();
@@ -107,7 +109,7 @@ int GetLastQuoteId(void) {
 }
 
 
-void EreaseHtmlInQuote(char *arr, int quote_lenght) {
+void EreaseHtmlInQuote(char *arr, int quote_length) {
     static const int    n_keywords = 3;
     static const int    n_punctutations = 4;
 
@@ -130,15 +132,15 @@ void EreaseHtmlInQuote(char *arr, int quote_lenght) {
         "\""
     };
 
-    int     new_quote_lenght = 0;
+    int     new_quote_length = 0;
 
     
     char    *pch = NULL; 
-    char    tmp_arr[quote_lenght]; 
+    char    tmp_arr[quote_length]; 
 
     bool    success = true;
    
-    memset(tmp_arr, 0, quote_lenght);
+    memset(tmp_arr, 0, quote_length);
 
     pch = strtok(arr, delimiter);
 
@@ -159,14 +161,14 @@ void EreaseHtmlInQuote(char *arr, int quote_lenght) {
         pch = strtok(NULL, delimiter);
     }   
 
-    new_quote_lenght = strlen(tmp_arr);
+    new_quote_length = strlen(tmp_arr);
 
-    memset(arr, '\0', quote_lenght);
-    memcpy(arr, tmp_arr, new_quote_lenght);
+    memset(arr, '\0', quote_length);
+    memcpy(arr, tmp_arr, new_quote_length);
 }
 
-void ParseQuote(char *arr, int quote_lenght) {
-    EreaseHtmlInQuote(arr, quote_lenght);            
+void ParseQuote(char *arr, int quote_length) {
+    EreaseHtmlInQuote(arr, quote_length);            
 }
 
 void PrintQuote(char *arr, int quote_id) {
@@ -190,22 +192,22 @@ void SetUrlDTCQuote(char *url, int quote_id) {
 void ShowQuoteText(int quote_id, int res, t_chunk chunk) {
     if(res == CURLE_OK) { 
         int  size_word = (int)strlen("class=\"decoration\">");        
-        int  quote_lenght;
+        int  quote_length;
 
         int  quote_begin_index = GetWordPosition(chunk, "class=\"decoration\">") + size_word;
         int  quote_end_index = GetWordPosition(chunk, "</a></p>") ;
 
-        quote_lenght = quote_end_index - quote_begin_index;
+        quote_length = quote_end_index - quote_begin_index;
 
-        char quote_text[quote_lenght + 1];
+        char quote_text[quote_length + 1];
 
-        for(int i = 0; i < quote_lenght; ++i) {
+        for(int i = 0; i < quote_length; ++i) {
             quote_text[i] = chunk.memory[quote_begin_index + i]; 
         }        
         
-        quote_text[quote_lenght] = '\0'; 
+        quote_text[quote_length] = '\0'; 
 
-        ParseQuote(quote_text, quote_lenght);
+        ParseQuote(quote_text, quote_length);
         PrintQuote(quote_text, quote_id); 
     }
     else {
@@ -269,51 +271,55 @@ int main(int argc, char *argv[]) {
     srand(time(NULL));
     
     t_param     p;
-    
-    int last_id_quote = GetLastQuoteId();
-        
+
+    static struct option long_options[] = {
+        {"random", 2, 0, 'r'},
+        {"last",   2, 0, 'l'},
+        {"quote",  2, 0, 'q'},
+        {"help",   2, 0, 'h'},
+        {0, 0, 0, 0}
+    };
+
+    int         last_id_quote = GetLastQuoteId();
+    int         option_index = 0;
+    char        opt[] = "rlqh";
+    char        c = 0; 
+
     p.last_quote_id = last_id_quote;
     p.last = false;
     p.random = false;
     p.quote_selected = -1;
     
     if(last_id_quote == 0) {
-        printf("Problème de connection.\n");
+        printf("Problème de connexion.\n");
         curl_global_cleanup();
         return -1;
     }
 
-    if(argc > 1) {
-        int         n_quotes = GetNumberThirdArgument(argc, argv);
+    while((c = getopt_long(argc, argv, opt, long_options, &option_index)) != -1) {
+        int n_quotes = GetNumberThirdArgument(argc, argv);
 
-        p.n_quotes = n_quotes;
-        
-        if(strcmp(argv[1], "-r") == 0
-        || strcmp(argv[1], "-random") == 0) {
-            p.random = true;            
-        }
-        else if(strcmp(argv[1], "-l") == 0
-        ||      strcmp(argv[1], "-last") == 0) {
-            p.last = true;   
-        }
-        else if(strcmp(argv[1], "-q") == 0
-        ||      strcmp(argv[1], "-quote") == 0) {
+    p.n_quotes = n_quotes;
+        switch(c) {
+        case 'r':
+            p.random = true;
+            break;
+        case 'l':
+            p.last = true;
+            break;
+        case 'q':
             p.n_quotes = 1;
-            p.quote_selected = GetNumberThirdArgument(argc, argv); 
-        }
-        else if(strcmp(argv[1], "-h") == 0
-            ||  strcmp(argv[1], "-help") == 0) {
+            p.quote_selected = n_quotes;
+            break;
+        case 'h':
             ShowHelp();
-        }
-        else {
+            break;
+        case '?':
             printf("Commande inconnue. Tapez -help pour avoir l'aide.\n");  
-        }
+            break;
+        } 
         ShowQuote(p);
     }
-    else {
-        p.random = true;
-        ShowQuote(p);
-    } 
     
     curl_global_cleanup();
     
