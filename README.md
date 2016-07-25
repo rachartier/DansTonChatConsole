@@ -7,7 +7,7 @@ Si vous n'avez pas "libcurl" d'installer, entrez cette commande: ``sudo apt-get 
 
 Pour compiler:
 
-`gcc dtcconsole.c $(pkg-config --libs --cflags libcurl) -Wall -Wextra -o dtcconsole`
+`gcc dtcconsole.c $(pkg-config --libs --cflags libcurl) -std=c99 -Wall -Wextra -o dtcconsole`
 
 Commandes:
 ----------
