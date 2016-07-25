@@ -315,7 +315,7 @@ int main(int argc, char *argv[]) {
             ShowHelp();
             break;
         case '?':
-            printf("Commande inconnue. Tapez -help pour avoir l'aide.\n");  
+            printf("Commande inconnue. Tapez --help pour avoir l'aide.\n");  
             break;
         } 
         ShowQuote(p);
